@@ -1,9 +1,25 @@
-<idea-plugin>
+<idea-plugin url="https://github.com/fchtngr/intellij-omarchy-theme-sync">
   <id>at.fchtngr.omarchy.intellij</id>
   <name>Omarchy Theme Sync</name>
+  <vendor url="https://github.com/fchtngr" email="t.feichtinger@pm.me">Thomas Feichtinger</vendor>
   <description><![CDATA[
-    Installs an Omarchy theme hook, generates IntelliJ theme data, and refreshes IntelliJ theme state.
+    Sync Omarchy themes with JetBrains IDEs.
+
+    <p>Automatically applies your current Omarchy color palette to the IDE UI theme and editor color scheme.</p>
+
+    <ul>
+      <li>Installs and manages an Omarchy <code>theme-set</code> hook.</li>
+      <li>Generates matching IDE theme and editor scheme files.</li>
+      <li>Refreshes the theme automatically when Omarchy changes.</li>
+      <li>Includes a manual <b>Refresh Omarchy Theme</b> action from the Tools menu.</li>
+    </ul>
   ]]></description>
+  <change-notes><![CDATA[
+    <ul>
+      <li>Initial Marketplace release.</li>
+      <li>Syncs Omarchy theme changes into JetBrains IDE UI and editor colors.</li>
+    </ul>
+  ]]></change-notes>
 
   <depends>com.intellij.modules.platform</depends>
 
