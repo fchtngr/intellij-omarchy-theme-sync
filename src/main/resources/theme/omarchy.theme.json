@@ -1,0 +1,105 @@
+{
+  "name": "Omarchy",
+  "dark": true,
+  "author": "Omarchy",
+  "editorScheme": "/theme/omarchy.xml",
+  "colors": {
+    "background": "#1a1b26",
+    "backgroundElevated": "#202331",
+    "backgroundSelected": "#7aa2f7",
+    "backgroundHover": "#24283b",
+    "backgroundFrame": "#202331",
+    "foreground": "#a9b1d6",
+    "foregroundBright": "#c0caf5",
+    "foregroundDim": "#6f7593",
+    "accent": "#7aa2f7",
+    "accentSecondary": "#bb9af7",
+    "border": "#3b4261",
+    "borderSubtle": "#4a5170",
+    "selection": "#7aa2f7",
+    "selectionInactive": "#4e5780",
+    "red": "#f7768e",
+    "orange": "#ff9e64",
+    "yellow": "#e0af68",
+    "green": "#9ece6a",
+    "blue": "#7aa2f7",
+    "purple": "#bb9af7",
+    "teal": "#0db9d7",
+    "caret": "#c0caf5",
+    "selectionForeground": "#c0caf5"
+  },
+  "ui": {
+    "*": {
+      "background": "background",
+      "foreground": "foreground",
+      "selectionBackground": "selection",
+      "selectionForeground": "selectionForeground",
+      "selectionInactiveBackground": "selectionInactive",
+      "borderColor": "border",
+      "separatorColor": "border",
+      "focusColor": "accent",
+      "focusedBorderColor": "accent",
+      "hoverBackground": "backgroundHover",
+      "pressedBackground": "backgroundSelected"
+    },
+    "MainWindow": {
+      "background": "backgroundFrame",
+      "Border.color": "border"
+    },
+    "Window": {
+      "background": "backgroundFrame"
+    },
+    "Panel": {
+      "background": "background",
+      "foreground": "foreground"
+    },
+    "Viewport": {
+      "background": "background"
+    },
+    "EditorTabs": {
+      "background": "background",
+      "underTabsBorderColor": "border",
+      "underlineColor": "accent",
+      "underlineHeight": 3,
+      "underlinedTabBackground": "backgroundElevated",
+      "hoverBackground": "backgroundHover"
+    },
+    "ToolWindow": {
+      "background": "background",
+      "Header.background": "background",
+      "Header.borderColor": "border",
+      "Stripe.background": "backgroundFrame"
+    },
+    "StatusBar": {
+      "background": "backgroundFrame",
+      "foreground": "foreground"
+    },
+    "TextField": {
+      "background": "backgroundElevated",
+      "foreground": "foreground",
+      "caretForeground": "caret",
+      "selectionBackground": "selection",
+      "selectionForeground": "selectionForeground",
+      "borderColor": "border",
+      "focusedBorderColor": "accent"
+    },
+    "Button": {
+      "arc": 8,
+      "background": "backgroundElevated",
+      "foreground": "foreground",
+      "focusedBorderColor": "accent"
+    },
+    "Tree": {
+      "background": "background",
+      "foreground": "foreground",
+      "selectionBackground": "selection",
+      "selectionForeground": "selectionForeground"
+    },
+    "List": {
+      "background": "background",
+      "foreground": "foreground",
+      "selectionBackground": "selection",
+      "selectionForeground": "selectionForeground"
+    }
+  }
+}

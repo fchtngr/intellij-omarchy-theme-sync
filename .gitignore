@@ -1,0 +1,37 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code local workspace settings
+.vscode/
+
+# Kotlin/Java build artifacts
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+
+# Logs
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+bin/

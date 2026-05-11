@@ -1,0 +1,26 @@
+<idea-plugin>
+  <id>at.fchtngr.omarchy.intellij</id>
+  <name>Omarchy Theme Sync</name>
+  <description><![CDATA[
+    Installs an Omarchy theme hook, generates IntelliJ theme data, and refreshes IntelliJ theme state.
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <postStartupActivity implementation="at.fchtngr.omarchy.intellij.OmarchyStartupActivity"/>
+    <notificationGroup id="Omarchy Notifications" displayType="BALLOON" bundle="messages.OmarchyBundle" key="notification.group.name"/>
+    <themeProvider id="at.fchtngr.omarchy.intellij.theme" path="/theme/omarchy.theme.json"/>
+  </extensions>
+
+  <actions>
+    <action
+        id="at.fchtngr.omarchy.intellij.RefreshThemeAction"
+        class="at.fchtngr.omarchy.intellij.RefreshThemeAction"
+        text="Refresh Omarchy Theme"
+        description="Reload Omarchy theme data from disk">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+    </action>
+  </actions>
+</idea-plugin>
