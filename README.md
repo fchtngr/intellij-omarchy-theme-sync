@@ -16,6 +16,15 @@ Plugin zip:
 
 - `build/distributions/`
 
+## Release
+
+Push a version tag to build the plugin ZIP and attach it to a GitHub release:
+
+```bash
+git tag v0.0.6
+git push origin v0.0.6
+```
+
 ## Install
 
 For normal use, install the plugin from JetBrains Marketplace once it is published.
