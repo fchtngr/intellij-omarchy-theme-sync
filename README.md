@@ -1,5 +1,7 @@
 # Omarchy Theme Sync
 
+![demo](demo.gif)
+
 Standalone IntelliJ/JetBrains plugin for syncing Omarchy themes.
 
 It installs its own Omarchy `theme-set` hook, generates IntelliJ theme data from the current Omarchy palette, and refreshes the IntelliJ UI theme and editor scheme with hot reloads.
