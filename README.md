@@ -4,12 +4,6 @@
 
 JetBrains IDE plugin for syncing [Omarchy](https://github.com/basecamp/omarchy) themes.
 
-## Marketplace metadata
-
-- Source code: <https://github.com/fchtngr/intellij-omarchy-theme-sync>
-- Issue tracker: <https://github.com/fchtngr/intellij-omarchy-theme-sync/issues>
-- License: MIT
-
 It installs its own Omarchy `theme-set` hook, generates IntelliJ theme data from the current Omarchy palette, and refreshes the IntelliJ UI theme and editor scheme with hot reloads.
 
 ## Build
