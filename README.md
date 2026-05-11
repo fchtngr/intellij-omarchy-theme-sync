@@ -25,6 +25,8 @@ git tag v0.0.6
 git push origin v0.0.6
 ```
 
+The release workflow derives the plugin version from the tag, so `v0.0.6` builds the plugin with version `0.0.6`. The `pluginVersion` in `gradle.properties` is only a local development fallback.
+
 ## Install
 
 For normal use, install the plugin from JetBrains Marketplace once it is published.
