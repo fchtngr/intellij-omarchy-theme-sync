@@ -9,11 +9,12 @@ import java.util.concurrent.TimeUnit
 
 object OmarchyHookInstaller {
     private val logger = thisLogger()
-    private const val START_MARKER = "# >>> omarchy-intellij-plugin >>>"
-    private const val END_MARKER = "# <<< omarchy-intellij-plugin <<<"
     private val installDir: Path = Paths.get(System.getProperty("user.home"), ".local", "share", "omarchy-intellij")
     private val syncScript: Path = installDir.resolve("omarchy-intellij-theme-sync.py")
-    private val hookPath: Path = Paths.get(System.getProperty("user.home"), ".config", "omarchy", "hooks", "theme-set")
+    private val hookPath: Path = Paths.get(
+        System.getProperty("user.home"),
+        ".config", "omarchy", "hooks", "theme-set.d", "omarchy-intellij-theme-sync",
+    )
 
     fun ensureInstalled(): Boolean {
         return runCatching {
@@ -56,18 +57,8 @@ object OmarchyHookInstaller {
 
     private fun installHook() {
         Files.createDirectories(hookPath.parent)
-        val body = "\"$syncScript\" \"\$@\""
-        val block = "$START_MARKER\n$body\n$END_MARKER"
-        val existing = if (Files.exists(hookPath)) Files.readString(hookPath) else "#!/usr/bin/env bash\nset -euo pipefail\n"
-        val withShebang = if (existing.startsWith("#!/usr/bin/env bash")) existing else "#!/usr/bin/env bash\nset -euo pipefail\n$existing"
-        val updated = if (withShebang.contains(START_MARKER) && withShebang.contains(END_MARKER)) {
-            val before = withShebang.substringBefore(START_MARKER).trimEnd()
-            val after = withShebang.substringAfter(END_MARKER)
-            "$before\n\n$block$after"
-        } else {
-            withShebang.trimEnd() + "\n\n" + block + "\n"
-        }
-        Files.writeString(hookPath, updated, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+        val body = "#!/bin/bash\n\"$syncScript\" \"\$@\"\n"
+        Files.writeString(hookPath, body, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
         hookPath.toFile().setExecutable(true, false)
     }
 }
