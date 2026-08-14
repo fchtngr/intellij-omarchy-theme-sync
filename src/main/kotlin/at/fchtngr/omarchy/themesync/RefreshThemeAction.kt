@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent

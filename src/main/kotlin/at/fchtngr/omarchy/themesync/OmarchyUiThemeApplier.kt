@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.UITheme

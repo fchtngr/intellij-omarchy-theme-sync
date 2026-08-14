@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.colors.EditorColorsManager

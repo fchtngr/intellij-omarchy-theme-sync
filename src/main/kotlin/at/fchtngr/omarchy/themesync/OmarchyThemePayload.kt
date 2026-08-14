@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import kotlinx.serialization.Serializable
 

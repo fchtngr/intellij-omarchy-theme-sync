@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import java.nio.file.Path
 import java.nio.file.Paths

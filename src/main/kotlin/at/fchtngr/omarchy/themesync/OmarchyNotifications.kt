@@ -1,4 +1,4 @@
-package at.fchtngr.omarchy.intellij
+package at.fchtngr.omarchy.themesync
 
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
