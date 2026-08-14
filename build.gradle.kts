@@ -1,9 +1,7 @@
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel
 
 plugins {
-    id("java")
     id("org.jetbrains.kotlin.jvm") version "2.3.20"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
     id("org.jetbrains.intellij.platform") version "2.18.1"
 }
 
@@ -18,16 +16,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
-    implementation(kotlin("stdlib"))
     intellijPlatform {
         val type = providers.gradleProperty("platformType")
         val version = providers.gradleProperty("platformVersion")
         create(type, version)
-        bundledPlugins(
-            providers.gradleProperty("platformPlugins")
-                .map { value -> value.split(',').map(String::trim).filter(String::isNotEmpty) }
-        )
     }
 }
 

@@ -9,14 +9,16 @@ import java.nio.file.Files
 object OmarchyUiThemeApplier {
     private val logger = thisLogger()
 
-    fun apply(manifest: OmarchyThemePayload) {
+    fun apply(): String {
         Files.newInputStream(OmarchyPaths.themeJson).use { input ->
-            val theme = UITheme.Companion.loadTempThemeFromJson(input, manifest.name)
+            val theme = UITheme.Companion.loadTempThemeFromJson(input, "omarchy")
             val laf = UIThemeLookAndFeelInfoImpl(theme)
             val manager = LafManager.getInstance()
             manager.setCurrentUIThemeLookAndFeel(laf)
             manager.updateUI()
-            logger.info("Applied Omarchy UI theme: ${manifest.name}")
+            val name = theme.name ?: "Omarchy"
+            logger.info("Applied Omarchy UI theme: $name")
+            return name
         }
     }
 }

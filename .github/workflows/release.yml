@@ -24,9 +24,6 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
-
       - name: Build plugin
         run: |
           VERSION="${GITHUB_REF_NAME#v}"

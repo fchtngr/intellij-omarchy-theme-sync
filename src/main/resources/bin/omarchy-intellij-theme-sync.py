@@ -3,19 +3,12 @@ import colorsys
 from datetime import datetime, timezone
 import json
 from pathlib import Path
-import re
 import sys
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    print('Python 3.11+ is required (missing tomllib)', file=sys.stderr)
-    raise SystemExit(1)
+import tomllib
 
 THEME_DIR = Path.home() / '.local/state/omarchy/current/theme'
 DEFAULT_NAME = 'Omarchy'
 OUTPUT_DIR = Path.home() / '.config/omarchy-intellij'
-MANIFEST_PATH = OUTPUT_DIR / 'manifest.json'
 THEME_JSON_PATH = OUTPUT_DIR / 'theme.json'
 SCHEME_XML_PATH = OUTPUT_DIR / 'omarchy.xml'
 REFRESH_TOKEN_PATH = OUTPUT_DIR / 'refresh.token'
@@ -77,10 +70,6 @@ def is_dark(color: str) -> bool:
     return luminance(color) < 0.4
 
 
-def sanitize_name(value: str) -> str:
-    return re.sub(r'\s+', ' ', value).strip() or DEFAULT_NAME
-
-
 def display_theme_name() -> str:
     theme_name_file = Path.home() / '.config/omarchy/current/theme.name'
     if len(sys.argv) > 1 and sys.argv[1].strip():
@@ -91,11 +80,7 @@ def display_theme_name() -> str:
         raw = DEFAULT_NAME
 
     raw = raw.replace('-', ' ').replace('_', ' ').title()
-    return f'Omarchy {sanitize_name(raw)}'
-
-
-def current_theme_dir() -> Path:
-    return THEME_DIR
+    return f"Omarchy {' '.join(raw.split()) or DEFAULT_NAME}"
 
 
 def load_palette(colors_file: Path) -> dict[str, str]:
@@ -115,11 +100,6 @@ def load_palette(colors_file: Path) -> dict[str, str]:
         'color5': 'magenta',
         'color6': 'cyan',
         'color9': 'bright_red',
-        'color10': 'bright_green',
-        'color11': 'bright_yellow',
-        'color12': 'bright_blue',
-        'color13': 'bright_magenta',
-        'color14': 'bright_cyan',
     }
     for ansi, semantic in ansi_aliases.items():
         if ansi not in palette and semantic in palette:
@@ -485,7 +465,7 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
     def opt(name: str, value: str) -> str:
         return f'    <option name="{name}" value="{xml_hex(value)}" />'
 
-    def attr(name: str, *, fg_value: str | None = None, bg_value: str | None = None, effect: str | None = None, effect_type: str | None = None, font_type: str | None = None) -> str:
+    def attr(name: str, *, fg_value: str | None = None, bg_value: str | None = None, effect: str | None = None, effect_type: str | None = None) -> str:
         parts = [f'    <option name="{name}">', '      <value>']
         if fg_value:
             parts.append(f'        <option name="FOREGROUND" value="{xml_hex(fg_value)}" />')
@@ -495,8 +475,6 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
             parts.append(f'        <option name="EFFECT_COLOR" value="{xml_hex(effect)}" />')
         if effect_type:
             parts.append(f'        <option name="EFFECT_TYPE" value="{effect_type}" />')
-        if font_type:
-            parts.append(f'        <option name="FONT_TYPE" value="{font_type}" />')
         parts += ['      </value>', '    </option>']
         return '\n'.join(parts)
 
@@ -530,37 +508,21 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
     return '\n'.join(lines) + '\n'
 
 
-def build_manifest(name: str, dark: bool) -> dict:
-    generated_at = datetime.now(timezone.utc).isoformat()
-    return {
-        'schemaVersion': 2,
-        'name': name,
-        'generatedAt': generated_at,
-        'dark': dark,
-        'themeFile': THEME_JSON_PATH.name,
-        'schemeFile': SCHEME_XML_PATH.name,
-    }
-
-
 def main() -> int:
-    colors_file = current_theme_dir() / 'colors.toml'
+    colors_file = THEME_DIR / 'colors.toml'
     if not colors_file.exists():
         raise SystemExit(f'Colors file not found: {colors_file}')
 
     palette = load_palette(colors_file)
     name = display_theme_name()
-    dark = is_dark(palette['background'])
     theme_json = build_theme_json(name, palette)
     editor_xml = build_editor_scheme_xml(name, palette)
-    manifest = build_manifest(name, dark)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    MANIFEST_PATH.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     THEME_JSON_PATH.write_text(json.dumps(theme_json, indent=2) + '\n', encoding='utf-8')
     SCHEME_XML_PATH.write_text(editor_xml, encoding='utf-8')
-    REFRESH_TOKEN_PATH.write_text(manifest['generatedAt'] + '\n', encoding='utf-8')
+    REFRESH_TOKEN_PATH.write_text(datetime.now(timezone.utc).isoformat() + '\n', encoding='utf-8')
 
-    print(f'Wrote {MANIFEST_PATH}')
     print(f'Wrote {THEME_JSON_PATH}')
     print(f'Wrote {SCHEME_XML_PATH}')
     print(f'Updated {REFRESH_TOKEN_PATH}')

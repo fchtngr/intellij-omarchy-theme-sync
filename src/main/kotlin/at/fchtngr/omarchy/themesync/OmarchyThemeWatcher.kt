@@ -25,17 +25,8 @@ object OmarchyThemeWatcher {
                 logger.info("Omarchy watcher started for ${OmarchyPaths.baseDir}")
                 while (true) {
                     val key = watchService.take()
-                    var shouldRefresh = false
-                    for (event in key.pollEvents()) {
-                        val name = event.context()?.toString() ?: continue
-                        if (
-                            name == OmarchyPaths.manifestJson.fileName.toString() ||
-                            name == OmarchyPaths.themeJson.fileName.toString() ||
-                            name == OmarchyPaths.schemeXml.fileName.toString() ||
-                            name == OmarchyPaths.refreshToken.fileName.toString()
-                        ) {
-                            shouldRefresh = true
-                        }
+                    val shouldRefresh = key.pollEvents().any {
+                        it.context()?.toString() == OmarchyPaths.refreshToken.fileName.toString()
                     }
                     key.reset()
                     if (shouldRefresh) {
