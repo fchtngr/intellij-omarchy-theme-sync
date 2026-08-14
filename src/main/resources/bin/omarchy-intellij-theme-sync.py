@@ -16,9 +16,15 @@ REQUIRED = [
     'background',
     'foreground',
     'accent',
-    'cursor',
-    'selection_background',
-    'selection_foreground',
+    'selection',
+    'bright_foreground',
+    'muted',
+    'red',
+    'yellow',
+    'green',
+    'cyan',
+    'blue',
+    'magenta',
 ]
 
 
@@ -88,6 +94,10 @@ def load_palette(colors_file: Path) -> dict[str, str]:
         data = tomllib.load(f)
     palette = {k: v for k, v in data.items() if isinstance(v, str) and v.startswith('#')}
 
+    missing = [key for key in REQUIRED if key not in palette]
+    if missing:
+        raise SystemExit(f'Missing required colors in {colors_file}: {", ".join(missing)}')
+
     palette['cursor'] = palette['bright_foreground']
     palette['selection_background'] = palette['selection']
     palette['selection_foreground'] = palette['bright_foreground']
@@ -104,10 +114,6 @@ def load_palette(colors_file: Path) -> dict[str, str]:
     for ansi, semantic in ansi_aliases.items():
         if ansi not in palette and semantic in palette:
             palette[ansi] = palette[semantic]
-
-    missing = [key for key in REQUIRED if key not in palette]
-    if missing:
-        raise SystemExit(f'Missing required colors in {colors_file}: {", ".join(missing)}')
     return palette
 
 
@@ -458,6 +464,7 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
     cursor = palette['cursor']
     sel_bg = palette['selection_background']
     sel_fg = palette['selection_foreground']
+    parent = 'Darcula' if is_dark(bg) else 'Default'
     line = shift_lightness(bg, 0.05 if is_dark(bg) else -0.05)
     gutter = shift_lightness(bg, 0.03 if is_dark(bg) else -0.03)
     ident = mix(accent, bg, 0.65)
@@ -465,7 +472,7 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
     def opt(name: str, value: str) -> str:
         return f'    <option name="{name}" value="{xml_hex(value)}" />'
 
-    def attr(name: str, *, fg_value: str | None = None, bg_value: str | None = None, effect: str | None = None, effect_type: str | None = None) -> str:
+    def attr(name: str, *, fg_value: str | None = None, bg_value: str | None = None, effect: str | None = None, effect_type: str | None = None, font_type: int | None = None) -> str:
         parts = [f'    <option name="{name}">', '      <value>']
         if fg_value:
             parts.append(f'        <option name="FOREGROUND" value="{xml_hex(fg_value)}" />')
@@ -475,11 +482,13 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
             parts.append(f'        <option name="EFFECT_COLOR" value="{xml_hex(effect)}" />')
         if effect_type:
             parts.append(f'        <option name="EFFECT_TYPE" value="{effect_type}" />')
+        if font_type is not None:
+            parts.append(f'        <option name="FONT_TYPE" value="{font_type}" />')
         parts += ['      </value>', '    </option>']
         return '\n'.join(parts)
 
     lines = [
-        f'<scheme name="{name}" version="142" parent_scheme="Darcula">',
+        f'<scheme name="{name}" version="142" parent_scheme="{parent}">',
         '  <colors>',
         opt('CARET_COLOR', cursor),
         opt('CARET_ROW_COLOR', line),
@@ -496,6 +505,41 @@ def build_editor_scheme_xml(name: str, palette: dict[str, str]) -> str:
         '  <attributes>',
         attr('DEFAULT_TEXT', fg_value=fg, bg_value=bg),
         attr('TEXT', fg_value=fg, bg_value=bg),
+        attr('DEFAULT_IDENTIFIER', fg_value=fg),
+        attr('DEFAULT_KEYWORD', fg_value=palette['magenta']),
+        attr('DEFAULT_STRING', fg_value=palette['green']),
+        attr('DEFAULT_NUMBER', fg_value=palette['yellow']),
+        attr('DEFAULT_CONSTANT', fg_value=palette['yellow']),
+        attr('DEFAULT_FUNCTION_DECLARATION', fg_value=palette['blue']),
+        attr('DEFAULT_FUNCTION_CALL', fg_value=palette['blue']),
+        attr('DEFAULT_INSTANCE_METHOD', fg_value=palette['blue']),
+        attr('DEFAULT_STATIC_METHOD', fg_value=palette['blue']),
+        attr('DEFAULT_CLASS_NAME', fg_value=palette['yellow']),
+        attr('DEFAULT_INTERFACE_NAME', fg_value=palette['yellow']),
+        attr('DEFAULT_CLASS_REFERENCE', fg_value=palette['yellow']),
+        attr('DEFAULT_PARAMETER', fg_value=palette['magenta'], font_type=2),
+        attr('DEFAULT_LOCAL_VARIABLE', fg_value=fg),
+        attr('DEFAULT_GLOBAL_VARIABLE', fg_value=fg),
+        attr('DEFAULT_INSTANCE_FIELD', fg_value=palette['blue']),
+        attr('DEFAULT_STATIC_FIELD', fg_value=palette['blue']),
+        attr('DEFAULT_LINE_COMMENT', fg_value=palette['muted'], font_type=2),
+        attr('DEFAULT_BLOCK_COMMENT', fg_value=palette['muted'], font_type=2),
+        attr('DEFAULT_DOC_COMMENT', fg_value=palette['muted'], font_type=2),
+        attr('DEFAULT_OPERATION_SIGN', fg_value=palette['cyan']),
+        attr('DEFAULT_BRACES', fg_value=palette['muted']),
+        attr('DEFAULT_PARENTHS', fg_value=palette['muted']),
+        attr('DEFAULT_BRACKETS', fg_value=palette['muted']),
+        attr('DEFAULT_DOT', fg_value=palette['muted']),
+        attr('DEFAULT_SEMICOLON', fg_value=palette['muted']),
+        attr('DEFAULT_COMMA', fg_value=palette['muted']),
+        attr('DEFAULT_LABEL', fg_value=palette['blue']),
+        attr('DEFAULT_VALID_STRING_ESCAPE', fg_value=palette['magenta']),
+        attr('DEFAULT_INVALID_STRING_ESCAPE', fg_value=palette['red']),
+        attr('DEFAULT_PREDEFINED_SYMBOL', fg_value=palette['red']),
+        attr('DEFAULT_METADATA', fg_value=palette['yellow']),
+        attr('DEFAULT_TAG', fg_value=palette['blue']),
+        attr('DEFAULT_ATTRIBUTE', fg_value=palette['yellow']),
+        attr('DEFAULT_ENTITY', fg_value=palette['cyan']),
         attr('CARET_ROW', bg_value=line),
         attr('IDENTIFIER_UNDER_CARET_ATTRIBUTES', bg_value=ident),
         attr('TEXT_SEARCH_RESULT_ATTRIBUTES', bg_value=mix(accent, bg, 0.30), effect=accent, effect_type='BOXED'),

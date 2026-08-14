@@ -10,7 +10,7 @@ object OmarchyEditorSchemeApplier {
 
     fun apply() {
         val manager = EditorColorsManager.getInstance()
-        val baseScheme = manager.globalScheme
+        val baseScheme = manager.schemeForCurrentUITheme
         val scheme = EditorColorsSchemeImpl(baseScheme)
         val root = SAXBuilder().build(OmarchyPaths.schemeXml.toFile()).rootElement
         scheme.readExternal(root)
