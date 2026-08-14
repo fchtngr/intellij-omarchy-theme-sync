@@ -77,7 +77,7 @@ def is_dark(color: str) -> bool:
 
 
 def display_theme_name() -> str:
-    theme_name_file = Path.home() / '.config/omarchy/current/theme.name'
+    theme_name_file = THEME_DIR.parent / 'theme.name'
     if len(sys.argv) > 1 and sys.argv[1].strip():
         raw = sys.argv[1].strip()
     elif theme_name_file.exists():
