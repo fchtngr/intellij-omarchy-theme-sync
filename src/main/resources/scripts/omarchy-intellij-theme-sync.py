@@ -77,7 +77,7 @@ def is_dark(color: str) -> bool:
 
 
 def display_theme_name() -> str:
-    theme_name_file = Path.home() / '.config/omarchy/current/theme.name'
+    theme_name_file = THEME_DIR.parent / 'theme.name'
     if len(sys.argv) > 1 and sys.argv[1].strip():
         raw = sys.argv[1].strip()
     elif theme_name_file.exists():
@@ -93,6 +93,9 @@ def load_palette(colors_file: Path) -> dict[str, str]:
     with colors_file.open('rb') as f:
         data = tomllib.load(f)
     palette = {k: v for k, v in data.items() if isinstance(v, str) and v.startswith('#')}
+
+    if 'bright_foreground' not in palette and 'bright_fg' in palette:
+        palette['bright_foreground'] = palette['bright_fg']
 
     missing = [key for key in REQUIRED if key not in palette]
     if missing:
