@@ -45,8 +45,6 @@ intellijPlatform {
         }
     }
     pluginVerification {
-        freeArgs.add("-mute")
-        freeArgs.add("TemplateWordInPluginId")
         failureLevel = listOf(
             FailureLevel.COMPATIBILITY_PROBLEMS,
             FailureLevel.OVERRIDE_ONLY_API_USAGES,

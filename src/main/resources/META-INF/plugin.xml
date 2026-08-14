@@ -1,5 +1,5 @@
 <idea-plugin url="https://github.com/fchtngr/intellij-omarchy-theme-sync">
-  <id>at.fchtngr.omarchy.intellij</id>
+  <id>at.fchtngr.omarchy.themesync</id>
   <name>Omarchy Theme Sync</name>
   <vendor url="https://github.com/fchtngr" email="t.feichtinger@pm.me">Thomas Feichtinger</vendor>
   <description><![CDATA[
@@ -26,12 +26,12 @@
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="at.fchtngr.omarchy.intellij.OmarchyStartupActivity"/>
     <notificationGroup id="Omarchy Notifications" displayType="BALLOON" bundle="messages.OmarchyBundle" key="notification.group.name"/>
-    <themeProvider id="at.fchtngr.omarchy.intellij.theme" path="/theme/omarchy.theme.json"/>
+    <themeProvider id="at.fchtngr.omarchy.themesync.theme" path="/theme/omarchy.theme.json"/>
   </extensions>
 
   <actions>
     <action
-        id="at.fchtngr.omarchy.intellij.RefreshThemeAction"
+        id="at.fchtngr.omarchy.themesync.RefreshThemeAction"
         class="at.fchtngr.omarchy.intellij.RefreshThemeAction"
         text="Refresh Omarchy Theme"
         description="Reload Omarchy theme data from disk">
