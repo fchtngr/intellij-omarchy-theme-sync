@@ -44,7 +44,7 @@ Then open `Settings | Plugins | ⚙ | Install Plugin from Disk...` and select th
 The plugin installs:
 
 - `~/.local/share/omarchy-intellij/omarchy-intellij-theme-sync.py`
-- a managed block in `~/.config/omarchy/hooks/theme-set`
+- `~/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync`
 
 The plugin reads generated runtime files from its own config directory:
 
@@ -52,3 +52,6 @@ The plugin reads generated runtime files from its own config directory:
 - `~/.config/omarchy-intellij/theme.json`
 - `~/.config/omarchy-intellij/omarchy.xml`
 - `~/.config/omarchy-intellij/refresh.token`
+
+The generator reads Omarchy Quattro's active theme directory
+(`~/.local/state/omarchy/current/theme`). It is invoked by the
