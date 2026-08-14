@@ -94,6 +94,9 @@ def load_palette(colors_file: Path) -> dict[str, str]:
         data = tomllib.load(f)
     palette = {k: v for k, v in data.items() if isinstance(v, str) and v.startswith('#')}
 
+    if 'bright_foreground' not in palette and 'bright_fg' in palette:
+        palette['bright_foreground'] = palette['bright_fg']
+
     missing = [key for key in REQUIRED if key not in palette]
     if missing:
         raise SystemExit(f'Missing required colors in {colors_file}: {", ".join(missing)}')
