@@ -45,7 +45,7 @@ object OmarchyHookInstaller {
 
     private fun installSyncScript() {
         Files.createDirectories(installDir)
-        val resource = OmarchyHookInstaller::class.java.getResourceAsStream("/bin/omarchy-intellij-theme-sync.py")
+        val resource = OmarchyHookInstaller::class.java.getResourceAsStream("/scripts/omarchy-intellij-theme-sync.py")
             ?: error("Missing bundled sync script")
         resource.use { input ->
             Files.copy(input, syncScript, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
