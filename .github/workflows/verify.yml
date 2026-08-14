@@ -1,0 +1,29 @@
+name: Verify
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  verify:
+    name: Verify plugin compatibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Verify plugin
+        run: ./gradlew verifyPlugin

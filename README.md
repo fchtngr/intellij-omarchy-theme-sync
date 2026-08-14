@@ -8,6 +8,8 @@ It installs its own Omarchy `theme-set` hook, generates IntelliJ theme data from
 
 ## Build
 
+Requires Java 17 and the Gradle wrapper (managed via `mise.toml`):
+
 ```bash
 ./gradlew buildPlugin
 ```
@@ -15,6 +17,21 @@ It installs its own Omarchy `theme-set` hook, generates IntelliJ theme data from
 Plugin zip:
 
 - `build/distributions/`
+
+## Verify
+
+Run the IntelliJ Plugin Verifier against the resolved target IDE (2024.1) and the latest release:
+
+```bash
+./gradlew verifyPlugin
+```
+
+The verifier must pass on `COMPATIBILITY_PROBLEMS` and `OVERRIDE_ONLY_API_USAGES`. The plugin deliberately uses the internal `UITheme.loadTempThemeFromJson` API, so `INTERNAL_API_USAGES` is excluded from the failure level, and the `TemplateWordInPluginId` check is muted for the published plugin id (`at.fchtngr.omarchy.intellij`).
+
+## CI
+
+- `.github/workflows/verify.yml` runs `./gradlew verifyPlugin` on every push to `master` and pull request.
+- `.github/workflows/release.yml` builds and attaches the plugin ZIP to a GitHub release when a `v*` tag is pushed.
 
 ## Release
 
@@ -55,3 +72,4 @@ The plugin reads generated runtime files from its own config directory:
 
 The generator reads Omarchy Quattro's active theme directory
 (`~/.local/state/omarchy/current/theme`). It is invoked by the
+`~/.config/omarchy/hooks/theme-set.d/` hook.

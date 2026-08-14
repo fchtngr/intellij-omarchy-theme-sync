@@ -1,8 +1,10 @@
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel
+
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.24"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.kotlin.jvm") version "2.3.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
+    id("org.jetbrains.intellij.platform") version "2.18.1"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -10,33 +12,48 @@ version = providers.gradleProperty("pluginVersion").get()
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-}
-
-intellij {
-    version.set(providers.gradleProperty("platformVersion"))
-    type.set(providers.gradleProperty("platformType"))
-    plugins.set(
-        providers.gradleProperty("platformPlugins")
-            .map { value -> value.split(',').map(String::trim).filter(String::isNotEmpty) }
-    )
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation(kotlin("stdlib"))
+    intellijPlatform {
+        val type = providers.gradleProperty("platformType")
+        val version = providers.gradleProperty("platformVersion")
+        create(type, version)
+        bundledPlugins(
+            providers.gradleProperty("platformPlugins")
+                .map { value -> value.split(',').map(String::trim).filter(String::isNotEmpty) }
+        )
+    }
 }
 
 kotlin {
     jvmToolchain(17)
 }
 
-tasks {
-    patchPluginXml {
+intellijPlatform {
+    buildSearchableOptions = false
+    pluginConfiguration {
         version.set(providers.gradleProperty("pluginVersion"))
-        sinceBuild.set("241")
-        untilBuild.set("")
+        ideaVersion {
+            sinceBuild.set("241")
+            untilBuild.set(provider { null })
+        }
     }
-
-    buildSearchableOptions {
-        enabled = false
+    pluginVerification {
+        freeArgs.add("-mute")
+        freeArgs.add("TemplateWordInPluginId")
+        failureLevel = listOf(
+            FailureLevel.COMPATIBILITY_PROBLEMS,
+            FailureLevel.OVERRIDE_ONLY_API_USAGES,
+        )
+        ides {
+            current()
+            latest()
+        }
     }
 }

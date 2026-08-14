@@ -2,6 +2,9 @@
 .gradle/
 build/
 
+# IntelliJ Platform Gradle Plugin local caches
+.intellijPlatform/
+
 # IntelliJ IDEA
 .idea/
 *.iml
