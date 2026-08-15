@@ -23,4 +23,9 @@ jobs:
           cache: gradle
 
       - name: Verify plugin
-        run: ./gradlew verifyPlugin
+        run: |
+          jq -e . manifest.json >/dev/null
+          bash -n install.sh test/install-test.sh
+          python -m py_compile scripts/omarchy-intellij-theme-sync.py
+          ./test/install-test.sh
+          ./gradlew verifyPlugin
