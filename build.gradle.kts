@@ -20,9 +20,8 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        val type = providers.gradleProperty("platformType")
         val version = providers.gradleProperty("platformVersion")
-        create(type, version)
+        intellijIdea(version)
     }
 }
 
@@ -35,7 +34,7 @@ intellijPlatform {
     pluginConfiguration {
         version.set(manifestVersion)
         ideaVersion {
-            sinceBuild.set("241")
+            sinceBuild.set("261")
             untilBuild.set(provider { null })
         }
     }

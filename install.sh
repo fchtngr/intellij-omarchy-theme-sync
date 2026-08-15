@@ -56,13 +56,13 @@ product_dirs=()
 if [[ -d $JETBRAINS_DIR ]]; then
   for product_dir in "$JETBRAINS_DIR"/*20*/; do
     [[ -d $product_dir ]] || continue
-    [[ $(basename "$product_dir") =~ 20(2[4-9]|[3-9][0-9])\.[0-9]+ ]] || continue
+    [[ $(basename "$product_dir") =~ 20(2[6-9]|[3-9][0-9])\.[0-9]+ ]] || continue
     product_dirs+=("$product_dir")
   done
 fi
 
 if (( ${#product_dirs[@]} == 0 )); then
-  echo "Installed the Omarchy theme hook; no JetBrains 2024.1+ profiles found yet."
+  echo "Installed the Omarchy theme hook; no JetBrains 2026.1+ profiles found yet."
   exit
 fi
 
