@@ -14,7 +14,7 @@ omarchy plugin add https://github.com/fchtngr/intellij-omarchy-theme-sync.git --
 
 Restart each detected JetBrains IDE once after installation. Later Omarchy theme changes are applied without restarting.
 
-The bridge supports JetBrains IDEs from 2024.1 onward installed in the standard Linux user data directory.
+The bridge supports JetBrains IDEs from 2026.1 onward installed in the standard Linux user data directory.
 
 ## Update
 
