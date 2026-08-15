@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fchtngr.intellij-theme-sync",
   "name": "IntelliJ Theme Sync",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "author": "Thomas Feichtinger",
   "description": "Syncs the active Omarchy theme to JetBrains IDEs.",
   "kinds": [
