@@ -27,17 +27,19 @@ jobs:
       - name: Build plugin
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
+          test "$(jq -r .version manifest.json)" = "$VERSION"
           ./gradlew buildPlugin -PpluginVersion="$VERSION"
+          cp build/distributions/omarchy-theme-sync-"$VERSION".zip build/distributions/omarchy-theme-sync-bridge.zip
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-distribution
-          path: build/distributions/*.zip
+          name: bridge-distribution
+          path: build/distributions/omarchy-theme-sync-bridge.zip
           if-no-files-found: error
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/distributions/*.zip
+          files: build/distributions/omarchy-theme-sync-bridge.zip
           generate_release_notes: true
