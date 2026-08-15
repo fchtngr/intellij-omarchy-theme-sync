@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask.FailureLevel
 
 plugins {
@@ -5,8 +6,10 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.18.1"
 }
 
+val manifestVersion = (JsonSlurper().parse(file("manifest.json")) as Map<*, *>)["version"].toString()
+
 group = providers.gradleProperty("pluginGroup").get()
-version = providers.gradleProperty("pluginVersion").get()
+version = manifestVersion
 
 repositories {
     mavenCentral()
@@ -30,7 +33,7 @@ kotlin {
 intellijPlatform {
     buildSearchableOptions = false
     pluginConfiguration {
-        version.set(providers.gradleProperty("pluginVersion"))
+        version.set(manifestVersion)
         ideaVersion {
             sinceBuild.set("241")
             untilBuild.set(provider { null })

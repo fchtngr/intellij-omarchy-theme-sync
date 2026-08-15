@@ -28,7 +28,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           test "$(jq -r .version manifest.json)" = "$VERSION"
-          ./gradlew buildPlugin -PpluginVersion="$VERSION"
+          ./gradlew buildPlugin
           cp build/distributions/omarchy-theme-sync-"$VERSION".zip build/distributions/omarchy-theme-sync-bridge.zip
 
       - name: Upload build artifact
