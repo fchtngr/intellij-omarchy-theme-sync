@@ -41,4 +41,4 @@ omarchy plugin validate .
 ./gradlew verifyPlugin
 ```
 
-Tags named `v<version>` publish the bridge archive consumed by the matching `manifest.json` version.
+Run the `Release` GitHub Actions workflow with the new version. It builds the bridge once, records its SHA-256 in `manifest.json`, commits and tags that metadata, then uploads the same archive.
