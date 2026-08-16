@@ -1,12 +1,18 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release (for example, 4.3.0)
+        required: true
+        type: string
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
 
 jobs:
   build:
@@ -16,6 +22,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -24,22 +33,45 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Build plugin
+      - name: Set release version
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          test "$(jq -r .version manifest.json)" = "$VERSION"
+          [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]
+          ! git rev-parse --verify --quiet "refs/tags/v$VERSION"
+          jq --arg version "$VERSION" '.version = $version | .bridgeSha256 = null' manifest.json > manifest.json.tmp
+          mv manifest.json.tmp manifest.json
+
+      - name: Build plugin
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
           ./gradlew buildPlugin
           cp build/distributions/omarchy-theme-sync-"$VERSION".zip build/distributions/omarchy-theme-sync-bridge.zip
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: bridge-distribution
-          path: build/distributions/omarchy-theme-sync-bridge.zip
-          if-no-files-found: error
+      - name: Record checksum and tag release commit
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          ARCHIVE=build/distributions/omarchy-theme-sync-bridge.zip
+          CHECKSUM=$(sha256sum "$ARCHIVE")
+          CHECKSUM=${CHECKSUM%% *}
+          jq --arg checksum "$CHECKSUM" '.bridgeSha256 = $checksum' manifest.json > manifest.json.tmp
+          mv manifest.json.tmp manifest.json
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add manifest.json
+          git commit -m "Release v$VERSION"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push --atomic origin HEAD:master "refs/tags/v$VERSION"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/distributions/omarchy-theme-sync-bridge.zip
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: >-
+          gh release create "v$VERSION"
+          build/distributions/omarchy-theme-sync-bridge.zip
+          --repo "$GITHUB_REPOSITORY"
+          --verify-tag
+          --generate-notes

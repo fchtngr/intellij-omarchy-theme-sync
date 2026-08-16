@@ -3,6 +3,7 @@
   "id": "fchtngr.intellij-theme-sync",
   "name": "IntelliJ Theme Sync",
   "version": "4.2.0",
+  "bridgeSha256": null,
   "author": "Thomas Feichtinger",
   "description": "Syncs the active Omarchy theme to JetBrains IDEs.",
   "kinds": [

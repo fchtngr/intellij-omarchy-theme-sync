@@ -29,6 +29,12 @@ validate_archive() {
     grep -Eq "^$PLUGIN_NAME/lib/[^/]+\.jar$" <<<"$entries"
 }
 
+verify_release_archive() {
+  local archive=$1 checksum
+  checksum=$(sha256sum -- "$archive") || return 1
+  [[ ${checksum%% *} == "$BRIDGE_SHA256" ]] && validate_archive "$archive"
+}
+
 uninstall() {
   local product_dir target
 
@@ -67,7 +73,16 @@ if (( ${#product_dirs[@]} == 0 )); then
 fi
 
 archive=${OMARCHY_INTELLIJ_BRIDGE_ARCHIVE:-$CACHE_ARCHIVE}
-if [[ ! -f $archive ]] || ! validate_archive "$archive"; then
+archive_validator=validate_archive
+if [[ $archive == "$CACHE_ARCHIVE" ]]; then
+  BRIDGE_SHA256=$(jq -er '.bridgeSha256 | select(type == "string" and test("^[0-9a-f]{64}$"))' "$PLUGIN_DIR/manifest.json") || {
+    echo "Missing or invalid bridgeSha256 in manifest.json" >&2
+    exit 1
+  }
+  archive_validator=verify_release_archive
+fi
+
+if [[ ! -f $archive ]] || ! "$archive_validator" "$archive"; then
   [[ $archive == "$CACHE_ARCHIVE" ]] || {
     echo "Invalid bridge archive: $archive" >&2
     exit 1
@@ -75,9 +90,9 @@ if [[ ! -f $archive ]] || ! validate_archive "$archive"; then
   mkdir -p "$CACHE_DIR"
   download=$(mktemp "$CACHE_DIR/.bridge.XXXXXX")
   trap 'rm -f -- "$download"' EXIT
-  if ! curl -fsSL "$RELEASE_ARCHIVE" -o "$download" || ! validate_archive "$download"; then
+  if ! curl -fsSL "$RELEASE_ARCHIVE" -o "$download" || ! verify_release_archive "$download"; then
     notify "Could not install the IntelliJ theme bridge"
-    echo "Could not download a valid bridge from $RELEASE_ARCHIVE" >&2
+    echo "Could not download a valid, checksum-matching bridge from $RELEASE_ARCHIVE" >&2
     exit 1
   fi
   mv -- "$download" "$CACHE_ARCHIVE"
