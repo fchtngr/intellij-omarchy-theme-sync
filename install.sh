@@ -12,6 +12,8 @@ PLUGIN_NAME="omarchy-theme-sync"
 CACHE_DIR="${XDG_CACHE_HOME:-"$HOME/.cache"}/omarchy-intellij-theme-sync"
 CACHE_ARCHIVE="$CACHE_DIR/$PLUGIN_NAME-$VERSION.zip"
 RELEASE_ARCHIVE="https://github.com/fchtngr/intellij-omarchy-theme-sync/releases/download/v$VERSION/$PLUGIN_NAME-bridge.zip"
+SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-intellij"
+REAL_SCRIPT="$SHARE_DIR/omarchy-intellij-theme-sync.py"
 
 [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]] || {
   echo "Invalid plugin version: $VERSION" >&2
@@ -35,18 +37,59 @@ verify_release_archive() {
   [[ ${checksum%% *} == "$BRIDGE_SHA256" ]] && validate_archive "$archive"
 }
 
-uninstall() {
-  local product_dir target
+# Collect all relevant JetBrains product directories
+collect_product_dirs() {
+  product_dirs=()
 
-  rm -f -- "$HOOK_PATH"
+  # Standard Linux plugins location
   if [[ -d $JETBRAINS_DIR ]]; then
-    for product_dir in "$JETBRAINS_DIR"/*20*/; do
+    for product_dir in "$JETBRAINS_DIR"/*/; do
       [[ -d $product_dir ]] || continue
-      target="$product_dir/$PLUGIN_NAME"
-      [[ -f $target/.omarchy-managed-version ]] || continue
-      rm -rf -- "$target"
+      [[ $(basename "$product_dir") == "Toolbox" ]] && continue
+      product_dirs+=("$product_dir")
     done
   fi
+
+  # Modern Toolbox plugins location
+  local TOOLBOX_APPS="$JETBRAINS_DIR/Toolbox/apps"
+  if [[ -d $TOOLBOX_APPS ]]; then
+    for app_dir in "$TOOLBOX_APPS"/*/; do
+      [[ -d $app_dir ]] || continue
+      if [[ -d "$app_dir/plugins" ]]; then
+        product_dirs+=("$app_dir/plugins")
+      else
+        product_dirs+=("$app_dir")
+      fi
+    done
+  fi
+
+  # Remove duplicates
+  local -A seen=()
+  local unique=()
+  local d
+  for d in "${product_dirs[@]}"; do
+    if [[ -z ${seen[$d]+x} ]]; then
+      seen[$d]=1
+      unique+=("$d")
+    fi
+  done
+  product_dirs=("${unique[@]}")
+}
+
+uninstall() {
+  rm -f -- "$HOOK_PATH"
+  rm -f -- "$REAL_SCRIPT"
+
+  collect_product_dirs
+
+  local product_dir target
+  for product_dir in "${product_dirs[@]}"; do
+    target="$product_dir/$PLUGIN_NAME"
+    [[ -f $target/.omarchy-managed-version ]] || continue
+    rm -rf -- "$target"
+    echo "Removed bridge from $product_dir"
+  done
+
   rm -f -- "$CACHE_ARCHIVE"
   echo "Removed the Omarchy IntelliJ theme hook and managed bridges."
 }
@@ -56,19 +99,21 @@ if [[ ${1:-} == "--uninstall" ]]; then
   exit
 fi
 
-install -Dm755 "$SYNC_SCRIPT" "$HOOK_PATH"
+# Install the real Python script
+install -Dm755 "$SYNC_SCRIPT" "$REAL_SCRIPT"
 
-product_dirs=()
-if [[ -d $JETBRAINS_DIR ]]; then
-  for product_dir in "$JETBRAINS_DIR"/*20*/; do
-    [[ -d $product_dir ]] || continue
-    [[ $(basename "$product_dir") =~ 20(2[6-9]|[3-9][0-9])\.[0-9]+ ]] || continue
-    product_dirs+=("$product_dir")
-  done
-fi
+# Install a shell wrapper as the actual hook (works even when Omarchy uses "sh")
+install -d "$(dirname "$HOOK_PATH")"
+cat > "$HOOK_PATH" << EOF
+#!/bin/bash
+exec python3 "$REAL_SCRIPT" "\$@"
+EOF
+chmod 755 "$HOOK_PATH"
+
+collect_product_dirs
 
 if (( ${#product_dirs[@]} == 0 )); then
-  echo "Installed the Omarchy theme hook; no JetBrains 2026.1+ profiles found yet."
+  echo "Installed the Omarchy theme hook. No JetBrains product directories found yet."
   exit
 fi
 
@@ -127,7 +172,7 @@ for product_dir in "${product_dirs[@]}"; do
 done
 
 if [[ -f $HOME/.local/state/omarchy/current/theme/colors.toml ]]; then
-  "$SYNC_SCRIPT"
+  "$REAL_SCRIPT"
 fi
 
 if (( updated )); then
