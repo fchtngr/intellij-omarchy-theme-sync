@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "fchtngr.intellij-theme-sync",
   "name": "IntelliJ Theme Sync",
-  "version": "4.3.0",
-  "bridgeSha256": "f02203273d326ecb114853629a760849286384acc6d39eefbfc152be44621397",
+  "version": "4.4.0",
+  "bridgeSha256": "e4b604daddca18ce441ba88c774d8ee75e9b8684dcca68dcea50ae5800f9459f",
   "author": "Thomas Feichtinger",
   "description": "Syncs the active Omarchy theme to JetBrains IDEs.",
   "kinds": [
