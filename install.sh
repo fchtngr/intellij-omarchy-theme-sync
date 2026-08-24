@@ -13,7 +13,7 @@ CACHE_DIR="${XDG_CACHE_HOME:-"$HOME/.cache"}/omarchy-intellij-theme-sync"
 CACHE_ARCHIVE="$CACHE_DIR/$PLUGIN_NAME-$VERSION.zip"
 RELEASE_ARCHIVE="https://github.com/fchtngr/intellij-omarchy-theme-sync/releases/download/v$VERSION/$PLUGIN_NAME-bridge.zip"
 SHARE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-intellij"
-REAL_SCRIPT="$SHARE_DIR/omarchy-intellij-theme-sync.py"
+INSTALLED_SYNC_SCRIPT="$SHARE_DIR/omarchy-intellij-theme-sync.py"
 
 [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]] || {
   echo "Invalid plugin version: $VERSION" >&2
@@ -42,10 +42,19 @@ collect_product_dirs() {
   product_dirs=()
 
   # Standard Linux plugins location
+  local product_dir name year release
   if [[ -d $JETBRAINS_DIR ]]; then
     for product_dir in "$JETBRAINS_DIR"/*/; do
       [[ -d $product_dir ]] || continue
-      [[ $(basename "$product_dir") == "Toolbox" ]] && continue
+
+      name=${product_dir%/}
+      name=${name##*/}
+      [[ $name =~ ^.+([0-9]{4})\.([0-9]+)$ ]] || continue
+
+      year=${BASH_REMATCH[1]}
+      release=${BASH_REMATCH[2]}
+      (( year > 2026 || (year == 2026 && 10#$release >= 1) )) || continue
+
       product_dirs+=("$product_dir")
     done
   fi
@@ -53,32 +62,21 @@ collect_product_dirs() {
   # Modern Toolbox plugins location
   local TOOLBOX_APPS="$JETBRAINS_DIR/Toolbox/apps"
   if [[ -d $TOOLBOX_APPS ]]; then
+    local app_dir build
     for app_dir in "$TOOLBOX_APPS"/*/; do
-      [[ -d $app_dir ]] || continue
-      if [[ -d "$app_dir/plugins" ]]; then
-        product_dirs+=("$app_dir/plugins")
-      else
-        product_dirs+=("$app_dir")
-      fi
+      [[ -f "$app_dir/product-info.json" && -d "$app_dir/plugins" ]] || continue
+
+      build=$(jq -er '.buildNumber | split(".")[0] | tonumber' "$app_dir/product-info.json") || continue
+      (( build >= 261 )) || continue
+
+      product_dirs+=("$app_dir/plugins")
     done
   fi
-
-  # Remove duplicates
-  local -A seen=()
-  local unique=()
-  local d
-  for d in "${product_dirs[@]}"; do
-    if [[ -z ${seen[$d]+x} ]]; then
-      seen[$d]=1
-      unique+=("$d")
-    fi
-  done
-  product_dirs=("${unique[@]}")
 }
 
 uninstall() {
   rm -f -- "$HOOK_PATH"
-  rm -f -- "$REAL_SCRIPT"
+  rm -f -- "$INSTALLED_SYNC_SCRIPT"
 
   collect_product_dirs
 
@@ -99,14 +97,14 @@ if [[ ${1:-} == "--uninstall" ]]; then
   exit
 fi
 
-# Install the real Python script
-install -Dm755 "$SYNC_SCRIPT" "$REAL_SCRIPT"
+# Install the persistent Python script
+install -Dm755 "$SYNC_SCRIPT" "$INSTALLED_SYNC_SCRIPT"
 
 # Install a shell wrapper as the actual hook (works even when Omarchy uses "sh")
 install -d "$(dirname "$HOOK_PATH")"
 cat > "$HOOK_PATH" << EOF
 #!/bin/bash
-exec python3 "$REAL_SCRIPT" "\$@"
+exec python3 "$INSTALLED_SYNC_SCRIPT" "\$@"
 EOF
 chmod 755 "$HOOK_PATH"
 
@@ -172,7 +170,7 @@ for product_dir in "${product_dirs[@]}"; do
 done
 
 if [[ -f $HOME/.local/state/omarchy/current/theme/colors.toml ]]; then
-  "$REAL_SCRIPT"
+  "$INSTALLED_SYNC_SCRIPT"
 fi
 
 if (( updated )); then

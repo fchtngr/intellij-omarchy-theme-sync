@@ -25,8 +25,24 @@ mv "$plugin_root/manifest.json.tmp" "$plugin_root/manifest.json"
 
 profile="$TEST_DIR/home/.local/share/JetBrains/IntelliJIdea2026.1"
 old_profile="$TEST_DIR/home/.local/share/JetBrains/IntelliJIdea2025.3"
+daemon_profile="$TEST_DIR/home/.local/share/JetBrains/Daemon"
+privacy_profile="$TEST_DIR/home/.local/share/JetBrains/PrivacyPolicy"
+toolbox_profile="$TEST_DIR/home/.local/share/JetBrains/Toolbox/apps/intellij-idea"
+old_toolbox_profile="$TEST_DIR/home/.local/share/JetBrains/Toolbox/apps/old-idea"
+incomplete_toolbox_profile="$TEST_DIR/home/.local/share/JetBrains/Toolbox/apps/incomplete-idea"
 theme="$TEST_DIR/home/.local/state/omarchy/current/theme"
-mkdir -p "$profile" "$old_profile" "$theme"
+mkdir -p \
+  "$profile" \
+  "$old_profile" \
+  "$daemon_profile" \
+  "$privacy_profile" \
+  "$toolbox_profile/plugins" \
+  "$old_toolbox_profile/plugins" \
+  "$incomplete_toolbox_profile" \
+  "$theme"
+printf '%s\n' '{"buildNumber":"261.22158.277"}' >"$toolbox_profile/product-info.json"
+printf '%s\n' '{"buildNumber":"260.22158.277"}' >"$old_toolbox_profile/product-info.json"
+printf '%s\n' '{"buildNumber":"262.22158.277"}' >"$incomplete_toolbox_profile/product-info.json"
 printf '%s\n' \
   'background = "#101010"' \
   'foreground = "#eeeeee"' \
@@ -52,8 +68,14 @@ HOME="$TEST_DIR/home" \
   "$plugin_root/install.sh"
 
 test -x "$TEST_DIR/home/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync.py"
+test -x "$TEST_DIR/home/.local/share/omarchy-intellij/omarchy-intellij-theme-sync.py"
 compgen -G "$profile/omarchy-theme-sync/lib/*.jar" >/dev/null
+compgen -G "$toolbox_profile/plugins/omarchy-theme-sync/lib/*.jar" >/dev/null
 test ! -e "$old_profile/omarchy-theme-sync"
+test ! -e "$daemon_profile/omarchy-theme-sync"
+test ! -e "$privacy_profile/omarchy-theme-sync"
+test ! -e "$old_toolbox_profile/plugins/omarchy-theme-sync"
+test ! -e "$incomplete_toolbox_profile/plugins/omarchy-theme-sync"
 test "$(<"$profile/omarchy-theme-sync/.omarchy-managed-version")" = "$version"
 test -s "$TEST_DIR/home/.config/omarchy-intellij/theme.json"
 test -s "$TEST_DIR/home/.config/omarchy-intellij/omarchy.xml"
@@ -64,7 +86,9 @@ HOME="$TEST_DIR/home" \
   XDG_CACHE_HOME="$TEST_DIR/home/.cache" \
   "$plugin_root/install.sh" --uninstall
 test ! -e "$profile/omarchy-theme-sync"
+test ! -e "$toolbox_profile/plugins/omarchy-theme-sync"
 test ! -e "$TEST_DIR/home/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync.py"
+test ! -e "$TEST_DIR/home/.local/share/omarchy-intellij/omarchy-intellij-theme-sync.py"
 
 mkdir -p "$TEST_DIR/tampered/omarchy-theme-sync"
 printf x >"$TEST_DIR/tampered/omarchy-theme-sync/tampered"
