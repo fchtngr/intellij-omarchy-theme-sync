@@ -2,7 +2,7 @@
 
 ![Demo](demo.gif)
 
-Syncs the active Omarchy theme to IntelliJ IDEA and other JetBrains IDEs.
+Syncs the active Omarchy theme to IntelliJ IDEA and other JetBrains IDEs, supporting both standalone and JetBrains Toolbox installations.
 
 The Omarchy plugin installs a `theme-set` hook and manages a small JetBrains bridge. The hook generates the current UI theme and editor scheme; the bridge applies them to running IDEs.
 
@@ -14,7 +14,7 @@ omarchy plugin add https://github.com/fchtngr/intellij-omarchy-theme-sync.git --
 
 Restart each detected JetBrains IDE once after installation. Later Omarchy theme changes are applied without restarting.
 
-The bridge supports JetBrains IDEs from 2026.1 onward installed in the standard Linux user data directory.
+The bridge supports JetBrains IDEs from 2026.1 onward installed in the standard Linux user data directory or through JetBrains Toolbox.
 
 ## Update
 
