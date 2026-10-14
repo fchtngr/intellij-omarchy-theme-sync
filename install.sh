@@ -5,7 +5,7 @@ set -euo pipefail
 PLUGIN_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 VERSION=$(jq -er '.version' "$PLUGIN_DIR/manifest.json")
 SYNC_SCRIPT="$PLUGIN_DIR/scripts/omarchy-intellij-theme-sync.py"
-HOOK_PATH="$HOME/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync.py"
+HOOK_PATH="$HOME/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync"
 DATA_HOME=${XDG_DATA_HOME:-"$HOME/.local/share"}
 JETBRAINS_DIR="$DATA_HOME/JetBrains"
 PLUGIN_NAME="omarchy-theme-sync"

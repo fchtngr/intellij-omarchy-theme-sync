@@ -67,7 +67,11 @@ HOME="$TEST_DIR/home" \
   XDG_CACHE_HOME="$TEST_DIR/home/.cache" \
   "$plugin_root/install.sh"
 
-test -x "$TEST_DIR/home/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync.py"
+hook="$TEST_DIR/home/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync"
+test -x "$hook"
+rm "$TEST_DIR/home/.config/omarchy-intellij/theme.json"
+HOME="$TEST_DIR/home" timeout 10 bash "$hook"
+test -s "$TEST_DIR/home/.config/omarchy-intellij/theme.json"
 test -x "$TEST_DIR/home/.local/share/omarchy-intellij/omarchy-intellij-theme-sync.py"
 compgen -G "$profile/omarchy-theme-sync/lib/*.jar" >/dev/null
 compgen -G "$toolbox_profile/plugins/omarchy-theme-sync/lib/*.jar" >/dev/null
@@ -87,7 +91,7 @@ HOME="$TEST_DIR/home" \
   "$plugin_root/install.sh" --uninstall
 test ! -e "$profile/omarchy-theme-sync"
 test ! -e "$toolbox_profile/plugins/omarchy-theme-sync"
-test ! -e "$TEST_DIR/home/.config/omarchy/hooks/theme-set.d/omarchy-intellij-theme-sync.py"
+test ! -e "$hook"
 test ! -e "$TEST_DIR/home/.local/share/omarchy-intellij/omarchy-intellij-theme-sync.py"
 
 mkdir -p "$TEST_DIR/tampered/omarchy-theme-sync"
